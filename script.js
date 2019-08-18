@@ -4,10 +4,6 @@ var vertical = (width < height) ? true : false;
 
 var mid = {x: width /2, y: height / 2};
 
-function onMouseDown(event) {
-
-}
-
 tool.minDistance = 15;
 tool.maxDistance = 45;
 
@@ -16,7 +12,7 @@ var topline;
 
 function onMouseDown(event) {
 	path = new Path();
-	path.fillColor = '#00000';
+	// path.fillColor = '#00000';
 	path.add(event.point);
   
   topline = new Path();
@@ -25,24 +21,50 @@ function onMouseDown(event) {
   topline.add(event.point);
 }
 
+
+var line;
+
+var top;
+var bottom;
+var prevTop;
+var prevBottom;
+
 function onMouseDrag(event) {
 
   var step = event.delta;
   
-  console.log(step.length  / tool.minDistance);
-	step.angle += 90 * step.length / tool.minDistance;
+  // console.log(step.length  / tool.minDistance);
+	// step.angle += 90 * step.length / tool.minDistance;
+  step.angle += 90;
 
-	var top = event.middlePoint + step;
-	var bottom = event.middlePoint - step;
-	
-  // skeleton
-	// var line = new Path();
-	// line.selected = true;
-	// line.add(top);
-	// line.add(bottom);
+  prevTop = top;
+  prevBottom = bottom;
   
-  topline.add(top);
-  topline.smooth();
+  console.log(prevTop);
+  console.log(prevBottom);
+  
+	top = event.middlePoint + step;
+	bottom = event.middlePoint - step;
+  
+	line = new Path();
+	// line.selected = true;
+	line.add(top);
+	line.add(bottom);
+  
+  
+  var trapezoid = new Path();
+  trapezoid.add(top);
+  trapezoid.add(prevTop);
+  trapezoid.add(prevBottom);
+  trapezoid.add(bottom);
+  
+  trapezoid.fillColor = 'white';
+  trapezoid.shadowColor = 'rgb(0,0,0,0.25)';
+  trapezoid.shadowBlur = 4;
+  trapezoid.smooth();
+  
+  // topline.add(top);
+  // topline.smooth();
 
   path.add(top);
 	path.insert(0, bottom);
@@ -59,5 +81,8 @@ function onMouseDrag(event) {
 
 
 function onMouseUp(event) {
-	
+  top = null;
+	bottom = null;
+//   prevBottom = null;
+//   prevTop = null;
 }
