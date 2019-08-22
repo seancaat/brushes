@@ -14,8 +14,14 @@ var colors = [
   // 'rgb(118, 80, 152)', // purple
   // 'rgb(241, 224, 82)', // yellow
   // 'rgb(223, 104,	63)' // red
-  '#FF0000',
+  // '#FF0000',
+  // '#00ff00',
+  // '#0000ff',
+  // '#ff8000'
   // 'black'
+// "#2A40D4",
+"#FF6F55",
+// "#F9F04D"
 ]
 
 function randof(array) {
@@ -32,9 +38,6 @@ function onMouseDown(event) {
 	path.add(event.point);
 }
 
-
-var line;
-
 var top;
 var bottom;
 
@@ -45,26 +48,34 @@ function onMouseDrag(event) {
 	// step.angle += 90 * step.length / tool.minDistance;
   step.angle += 90;
   
-	top = event.middlePoint + 50 * Math.sin(event.count);
-	bottom = event.middlePoint + 50 * Math.sin(event.count + 0.5);
+  top = event.middlePoint + 30;
+  bottom = event.middlePoint - 30;
+
+  // top = event.middlePoint + 50 * Math.sin(event.count);
+	// top = event.middlePoint + 50 * Math.sin(event.count) * Math.sin(event.count);  
+	// bottom = event.middlePoint + 50 * Math.sin((event.count + 0.5)) ;
 
   path.add(top);
 	path.insert(0, bottom);
 
 	path.smooth();
-	
-  
+	  
 }
-
-
-
-
-
 
 
 function onMouseUp(event) {
   top = null;
-	bottom = null;
-//   prevBottom = null;
-//   prevTop = null;
+  bottom = null;
+  
+  // console.log(path.segments)
+}
+
+function onFrame(event) {
+  if (path) {
+    for(var i = 0; i < path.segments.length; i++) {
+      path.segments[i].handleIn.x += 2 * Math.cos(3 * Math.sin(event.time + i));
+      path.segments[i].handleOut.x += 2 * Math.sin(event.time);
+    }
+  }
+  
 }
