@@ -18,10 +18,11 @@ var colors = [
   // '#00ff00',
   // '#0000ff',
   // '#ff8000'
-  // 'black'
-// "#2A40D4",
-"#FF6F55",
-// "#F9F04D"
+  // 'black',
+// "#2A40D4", // triadic
+// "#FF6F55", // tradic
+// "#F9F04D"  // triadic 
+  '#0095cd','#1d94c0', '#3692b4', '#4b8fa7' // greens
 ]
 
 function randof(array) {
@@ -48,8 +49,8 @@ function onMouseDrag(event) {
 	// step.angle += 90 * step.length / tool.minDistance;
   step.angle += 90;
   
-  top = event.middlePoint + 30;
-  bottom = event.middlePoint - 30;
+  top = event.middlePoint + 10;
+  bottom = event.middlePoint - 10;
 
   // top = event.middlePoint + 50 * Math.sin(event.count);
 	// top = event.middlePoint + 50 * Math.sin(event.count) * Math.sin(event.count);  
@@ -73,8 +74,8 @@ function onMouseUp(event) {
 function onFrame(event) {
   if (path) {
     for(var i = 0; i < path.segments.length; i++) {
-      path.segments[i].handleIn.x += 2 * Math.cos(3 * Math.sin(event.time + i));
-      path.segments[i].handleOut.x += 2 * Math.sin(event.time);
+      path.segments[i].handleIn.x += 2 * Math.sin(5* event.time);
+      path.segments[i].handleOut.x -= 2 * Math.sin(5* event.time);
     }
   }
   
