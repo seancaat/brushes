@@ -40,39 +40,40 @@ function onMouseDown(event) {
 
 var top;
 var bottom;
+
+function makeLeafSymbols(colorArray) {
+  var arr = [];
+
+  for(var i = 0; i < colorArray.length; i++) {
+    var ellipse = new Path.Ellipse({
+      point: [0, 0],
+      size: [15, 15],
+      fillColor: colorArray[i]
+    });
+
+    var leaf = new SymbolDefinition(ellipse);
+
+    arr.push(leaf);
+  }
+
+  return arr;
+
+}
+
+var leafSymbols = makeLeafSymbols(colors);
 var leaves = [];
 
 function onMouseDrag(event) {
   var step = event.delta;
-  console.log(step);
-
-  
-	// step.angle += 90 * step.length / tool.minDistance;
   step.angle += 90;
-  
-  top = event.middlePoint + 10;
-  bottom = event.middlePoint - 10;
 
+  var topLeaf = randof(leafSymbols).place(event.middlePoint);
+  topLeaf.scale(3 + 1.5 * Math.sin(Math.random() * event.count * 1.05), event.delta.length / 15, event.middlePoint + 8);
+  topLeaf.rotate(step.angle, event.middlePoint - 2.5);
 
-  var sizeFactor = tool.minDistance * 2;
-  var minSize = sizeFactor * 2;
-
-
-  var topLeaf = new Path.Ellipse({
-    point: event.middlePoint - 5,
-    size: [minSize + sizeFactor * Math.sin(Math.random() * event.count), event.delta.length],
-    fillColor: randof(colors)
-  });
-
-  topLeaf.rotation = step.angle;
-
-  var bottomLeaf = new Path.Ellipse({
-    point: event.middlePoint + 5,
-    size: [minSize + sizeFactor * Math.sin(Math.random() * event.count * 1.05), event.delta.length],
-    fillColor: randof(colors)
-  });
-  bottomLeaf.pivot = bottomLeaf.bounds.leftCenter;
-  bottomLeaf.rotation = step.angle;
+  var bottomLeaf = randof(leafSymbols).place(event.middlePoint);
+  bottomLeaf.scale(3 + 1.5 * Math.sin(Math.random() * event.count), event.delta.length / 15, event.middlePoint - 8);
+  bottomLeaf.rotate(step.angle, event.middlePoint + 2.5);
 
   leaves.push(topLeaf);
   leaves.push(bottomLeaf);
@@ -92,7 +93,7 @@ function onMouseUp(event) {
 function onFrame(event) {
   if (path) {
     for(var i = 0; i < leaves.length; i++) {
-      leaves[i].rotation += 0.5 * Math.sin(Math.cos(event.time + i) / 10 + i)  * 0.5 * Math.cos(event.time / 20) * Math.sin(2.5 * event.time + i);;
+      leaves[i].rotation += 0.5 * Math.sin(Math.cos(event.time + i) / 100 + i/4)  * 0.5 * Math.cos(event.time / 80) * 0.75 * Math.sin(event.time + i/2);
     }
   }
   
