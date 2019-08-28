@@ -91,9 +91,10 @@ function onMouseUp(event) {
 function onFrame(event) {
   if (path) {
     for(var i = 0; i < leaves.length; i++) {
+      leaves[i].scale(0.2 + 0.805 * Math.abs(Math.sin(1/4 * event.time + i)));
       leaves[i].position.x += 0.037 * Math.cos(1.03 * event.time * Math.sin(i));
       leaves[i].position.y += 0.05 * Math.cos(event.time * Math.sin(i));
-      leaves[i].rotate(0.2 * Math.sin(2 * event.time + i))
+      leaves[i].rotate(0.5 * Math.sin(5 * event.time + i))
     }
   }
   
