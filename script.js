@@ -78,7 +78,7 @@ function onMouseDrag(event) {
   leaves.push(topLeaf);
   leaves.push(bottomLeaf);
 
-	path.smooth();
+	// path.smooth();
 	  
 }
 
@@ -86,14 +86,14 @@ function onMouseDrag(event) {
 function onMouseUp(event) {
   top = null;
   bottom = null;
-  
-  // console.log(path.segments)
 }
 
 function onFrame(event) {
   if (path) {
     for(var i = 0; i < leaves.length; i++) {
-      leaves[i].rotation += 0.5 * Math.sin(Math.cos(event.time + i) / 100 + i/4)  * 0.5 * Math.cos(event.time / 80) * 0.75 * Math.sin(event.time + i/2);
+      leaves[i].position.x += 0.037 * Math.cos(1.03 * event.time * Math.sin(i));
+      leaves[i].position.y += 0.05 * Math.cos(event.time * Math.sin(i));
+      leaves[i].rotate(0.2 * Math.sin(2 * event.time + i))
     }
   }
   
