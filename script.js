@@ -4,87 +4,68 @@ var vertical = (width < height) ? true : false;
 
 var mid = {x: width /2, y: height / 2};
 
-tool.minDistance = 15;
-tool.maxDistance = 20;
+tool.minDistance = 144;
 
-var path;
+var path = new Path();
+path.strokeWidth = 2;
+path.strokeColor = '#0B0A0F';
 
 var colors = [
-  // 'rgb(110, 189, 168)', // green
-  // 'rgb(118, 80, 152)', // purple
-  // 'rgb(241, 224, 82)', // yellow
-  // 'rgb(223, 104,	63)' // red
-  // '#FF0000', // cutting red
-  // '#00ff00',
-  // '#0000ff',
-  // '#ff8000'
-  // 'black',
-"#2A40D4","#FF6F55", "#F9F04D"  // triadic 
-  // '#0095cd','#1d94c0', '#3692b4', '#4b8fa7', // blues
-  // '#008e50','#138151', '#237551', '#2f684f' // greens
+  'black'
+  // '#610635', '#325b06', '#065e5a', '#5b1a06' //near-black
 ]
 
-function randof(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
-
-// var c = new Path.Circle(0, 0, 0)
-
-var circles = [];
-// make bigger and bigger flowers 
-// start off smmall, grow slow, the explode big. this will be a function of event.count of drag
-function makeFlower(x, y, size, radiusFactor, petalSizes) {
-
-  for (var i = 0; i < size; i++) {
-    var angle = (i) * 137.5;
-    var radius = radiusFactor * Math.sqrt(i);
-    // can I somehow make it so that event.posiiton of a drag is always the x, y that gets passed?
-    var coords = polarToCartesian(x, y, radius, angle); 
-
-    //place something at coords
-    var c = new Path.Circle(new Point(coords.x, coords.y), petalSizes);
-
-    c.fillColor = {
-      gradient: {
-        stops: [randof(colors), randof(colors)]
-      },
-      origin: c.bounds.topLeft,
-      destination: c.bounds.bottomRight
-    };
-
-    circles.push(c);
-
-  }
-
-  function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
-    var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-  
-    return {
-      x: centerX + (radius * Math.cos(angleInRadians)),
-      y: centerY + (radius * Math.sin(angleInRadians))
-    };
-  }
-}
+var fib = [5, 8, 13, 21, 34, 55];
 
 function onMouseDown(event) {
-  
+  for(var i = 0; i < randof(fib); i++) {
+    var pt = pointInCircle(5 * randof(fib));
+
+    path.add(event.point + pt);
+    path.smooth({ type: 'continuous' });
+  }
 }
 
 function onMouseDrag(event) {
-  // makeFlower(x, y, number of petals, radiusFactor, petalSizes)
-  makeFlower(event.point.x, event.point.y, event.count /2, event.count / 4 , event.count/1.5);
+  for(var i = 0; i < randof(fib); i++) {
+    var pt = pointInCircle(5 * randof(fib));
 
+    path.add(event.point + pt);
+    path.smooth({ type: 'continuous' });
+  }
 }
 
-
 function onMouseUp(event) {
-//   console.log(circles)
-//   for(var i = 0; i < circles.length; i++) {
-//     circles[i].pivot = event.point;
-//     circles[i].applyMatrix = false;
-//     circles[i].tween({ro}, {easing: cubicInOut, duration: 500}); 
-//   }
+
 }
 
 function onFrame(event) {
+  for(var i = 0; i < path.segments.length; i++) {
+
+    path.segments[i].point.x += 0.1308 * Math.random() * Math.sin(0.3 *  event.time + randof(fib) * i);
+    path.segments[i].point.y += 0.081 * Math.random() * Math.cos(0.5 *  event.time + randof(fib) * i);
+
+    path.segments[i].handleIn += 0.52 * Math.random() * Math.cos(8 *  event.time + randof(fib) * i);
+    path.segments[i].handleOut += 0.307 * Math.random() * Math.sin(13 *  event.time + randof(fib) * i);
+  }
+}
+
+
+function pointInCircle(n) {
+  // n is the radius
+  var u = Math.random();
+  var v = Math.random();
+
+  var theta = u * 2.0 * Math.PI;
+  var phi = Math.acos(2.0 * v - 1.0);
+  var r = Math.cbrt(Math.random());
+
+  var x = r * Math.sin(phi) * Math.cos(theta);
+  var y = r * Math.sin(phi) * Math.sin(theta);
+
+  return new Point(n * x, n * y);
+}
+
+function randof(array) {
+  return array[Math.floor(Math.random() * array.length)];
 }
