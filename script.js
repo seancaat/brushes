@@ -4,96 +4,132 @@ var vertical = (width < height) ? true : false;
 
 var mid = {x: width /2, y: height / 2};
 
-tool.minDistance = 10;
-tool.maxDistance = 20;
+tool.minDistance = 144;
 
-var path;
+var path = new Path();
+path.strokeWidth = 5;
+path.strokeCap = 'round';
+path.strokeColor = '#0B0A0F';
+path.dashArray = [100, 144];
+
+// var colors = [
+//   '#0B0A0F'
+//   // '#610635', '#325b06', '#065e5a', '#5b1a06' //near-black
+  
+// ]
 
 var colors = [
-  // 'rgb(110, 189, 168)', // green
-  // 'rgb(118, 80, 152)', // purple
-  // 'rgb(241, 224, 82)', // yellow
-  // 'rgb(223, 104,	63)' // red
-  // '#FF0000', // cutting red
-  // '#00ff00',
-  // '#0000ff',
-  // '#ff8000'
-  // 'black',
-// "#2A40D4","#FF6F55", // "#F9F04D"  // triadic 
-  // '#0095cd','#1d94c0', '#3692b4', '#4b8fa7' // blues
-  '#008e50','#138151', '#237551', '#2f684f' // greens
-]
+  'rgb(236,112,99)',
+  'rgb(155,96,52)',
+  'rgb(245,189,75)',
+  'rgb(231,231,130)',
+  'rgb(234,240,183)',
+  'rgb(173,213,167)',
+  'rgb(106,183,128)',
+  'rgb(109,191,137)',
+  'rgb(34,95,62)',
+  'rgb(124,199,177)',
+  'rgb(106,188,204)',
+  'rgb(131,207,240)',
+  'rgb(184,209,236)',
+  'rgb(62,88,167)',
+  'rgb(212,175,207)',
+  'rgb(245,219,234)',
+  'rgb(250,190,208)',
+  'rgb(245,287,203)',
+  'rgb(211,3,34)',
+  'rgb(90,86,88)',
+  'rgb(113,113,113)',
+  'rgb(202,202,202)',
+];
 
-function randof(array) {
-  return array[Math.floor(Math.random() * array.length)];
-}
+var lil_fib = [5, 8, 13];
 
+var big_fib = [5, 8, 13, 21, 34];
 
 function onMouseDown(event) {
-	path = new Path();
-  path.fillColor = randof(colors);
-  path.shadowColor = 'rgb(0,0,0,0.25)';
-  path.shadowBlur = 2; 
-  // path.blendMode = 'difference';
-	path.add(event.point);
-}
+  for(var i = 0; i < randof(lil_fib); i++) {
+    var pt = pointInCircle(5 * randof(big_fib));
 
-var top;
-var bottom;
-var leaves = [];
+    path.add(event.point + pt);
+    path.simplify();
+    path.smooth({ type: 'catmull-rom', factor: 0.0 });
+  }
+
+  // var c2 = new Path.Circle(new Point(event.point.y, Math.random() * width), Math.floor(Math.random() * 90));
+  // c2.fillColor = randof(colors);
+  // c2.strokeColor = '#0B0A0F';
+  // c2.strokeWidth = 3;
+
+  // if(Math.random() < 0.49) {
+  //   c2.insertBelow(path)
+  // } else {
+  //   c2.shadowColor = 'rgb(0,0,0,0.5)';
+  //   c2.shadowBlur = randof(lil_fib);
+  //   c2.shadowOffset = new Point(2,2);
+  // }
+}
 
 function onMouseDrag(event) {
-  var step = event.delta;
-  console.log(step);
+  for(var i = 0; i < randof(lil_fib); i++) {
+    var pt = pointInCircle(5 * randof(big_fib));
 
-  
-	// step.angle += 90 * step.length / tool.minDistance;
-  step.angle += 90;
-  
-  top = event.middlePoint + 10;
-  bottom = event.middlePoint - 10;
+    path.add(event.point + pt);
+    path.simplify();
+    path.smooth({ type: 'catmull-rom', factor: 1.0 });
+  }
 
+  // var c1 = new Path.Circle(new Point(event.point.x, Math.random() * height), Math.floor(Math.random() * 90));
+  // c1.fillColor = randof(colors);
+  // c1.strokeColor = '#0B0A0F';
+  // c1.strokeWidth = 3;
 
-  var sizeFactor = tool.minDistance * 2;
-  var minSize = sizeFactor * 2;
+  // for(var i = 0; i < c1.segments.length; i++) {
+  //   c1.segments[i].point.x += i * Math.random() * 5;
+  //   c1.segments[i].point.y -= i * Math.random() * 5;
+  // }
 
+  // if(Math.random() < 0.49) {
+  //   c1.insertBelow(path)
+  // } else {
+  //     c1.shadowColor = 'rgb(0,0,0,0.5)';
+  //     c1.shadowBlur = randof(lil_fib);
+  //     c1.shadowOffset = new Point(2,2);
+  // }
 
-  var topLeaf = new Path.Ellipse({
-    point: event.middlePoint - 5,
-    size: [minSize + sizeFactor * Math.sin(Math.random() * event.count), event.delta.length],
-    fillColor: randof(colors)
-  });
-
-  topLeaf.rotation = step.angle;
-
-  var bottomLeaf = new Path.Ellipse({
-    point: event.middlePoint + 5,
-    size: [minSize + sizeFactor * Math.sin(Math.random() * event.count * 1.05), event.delta.length],
-    fillColor: randof(colors)
-  });
-  bottomLeaf.pivot = bottomLeaf.bounds.leftCenter;
-  bottomLeaf.rotation = step.angle;
-
-  leaves.push(topLeaf);
-  leaves.push(bottomLeaf);
-
-	path.smooth();
-	  
 }
 
-
 function onMouseUp(event) {
-  top = null;
-  bottom = null;
   
-  // console.log(path.segments)
 }
 
 function onFrame(event) {
-  if (path) {
-    for(var i = 0; i < leaves.length; i++) {
-      leaves[i].rotation += 0.5 * Math.sin(Math.cos(event.time + i) / 10 + i)  * 0.5 * Math.cos(event.time / 20) * Math.sin(2.5 * event.time + i);;
-    }
+  for(var i = 0; i < path.segments.length; i++) {
+
+    path.segments[i].point.x += 1.5 * Math.sin(0.03 *  event.time * i);
+    path.segments[i].point.y += 0.5 * Math.cos(0.05 *  event.time * i);
+
+    path.segments[i].handleIn += 0.52 * Math.random() * Math.cos(8 *  event.time + randof(big_fib) * i);
+    // path.segments[i].handleOut += 0.307 * Math.random() * Math.sin(13 *  event.time + randof(big_fib) * i);
   }
-  
+}
+
+
+function pointInCircle(n) {
+  // n is the radius
+  var u = Math.random();
+  var v = Math.random();
+
+  var theta = u * 2.0 * Math.PI;
+  var phi = Math.acos(2.0 * v - 1.0);
+  var r = Math.cbrt(Math.random());
+
+  var x = r * Math.sin(phi) * Math.cos(theta);
+  var y = r * Math.sin(phi) * Math.sin(theta);
+
+  return new Point(n * x, n * y);
+}
+
+function randof(array) {
+  return array[Math.floor(Math.random() * array.length)];
 }
