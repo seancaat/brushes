@@ -2,121 +2,129 @@ var width = window.innerWidth;
 var height = window.innerHeight;
 var vertical = (width < height) ? true : false;
 
-var mid = {x: width /2, y: height / 2};
+var mid = {x: width / 2, y: height / 2};
 
-tool.minDistance = 144;
+var bg = new Path.Rectangle(new Point(0,0), new Point(width, height));
+bg.fillColor = "#F7F4EF";
+
+
+console.log(document.body);
+
+tool.minDistance = 2;
 
 var path = new Path();
-path.strokeWidth = 5;
+path.strokeWidth = 3;
 path.strokeCap = 'round';
 path.strokeColor = '#0B0A0F';
-path.dashArray = [100, 144];
-
-// var colors = [
-//   '#0B0A0F'
-//   // '#610635', '#325b06', '#065e5a', '#5b1a06' //near-black
-  
-// ]
 
 var colors = [
-  'rgb(236,112,99)',
-  'rgb(155,96,52)',
-  'rgb(245,189,75)',
-  'rgb(231,231,130)',
-  'rgb(234,240,183)',
-  'rgb(173,213,167)',
-  'rgb(106,183,128)',
-  'rgb(109,191,137)',
-  'rgb(34,95,62)',
-  'rgb(124,199,177)',
-  'rgb(106,188,204)',
-  'rgb(131,207,240)',
-  'rgb(184,209,236)',
-  'rgb(62,88,167)',
-  'rgb(212,175,207)',
-  'rgb(245,219,234)',
-  'rgb(250,190,208)',
-  'rgb(245,287,203)',
-  'rgb(211,3,34)',
-  'rgb(90,86,88)',
-  'rgb(113,113,113)',
-  'rgb(202,202,202)',
+"#EB5757",
+"#F2994A",
+"#F2C94C",
+"#219653",
+"#27AE60",
+"#6FCF97",
+"#2F80ED",
+"#2D9CDB",
+"#56CCF2",
+"#9B51E0",
+"#BB6BD9"
 ];
 
-var lil_fib = [5, 8, 13];
+var from;
+var to;
 
-var big_fib = [5, 8, 13, 21, 34];
+//all change size when click?
+
+var pts = [];
+
+var rect = new Path.Rectangle();
+rect.strokeColor = "rgb(0,0,0)";
+rect.strokeWidth = 1;
+
+var shapes = [];
 
 function onMouseDown(event) {
-  for(var i = 0; i < randof(lil_fib); i++) {
-    var pt = pointInCircle(5 * randof(big_fib));
-
-    path.add(event.point + pt);
-    path.simplify();
-    path.smooth({ type: 'catmull-rom', factor: 0.0 });
-  }
-
-  // var c2 = new Path.Circle(new Point(event.point.y, Math.random() * width), Math.floor(Math.random() * 90));
-  // c2.fillColor = randof(colors);
-  // c2.strokeColor = '#0B0A0F';
-  // c2.strokeWidth = 3;
-
-  // if(Math.random() < 0.49) {
-  //   c2.insertBelow(path)
-  // } else {
-  //   c2.shadowColor = 'rgb(0,0,0,0.5)';
-  //   c2.shadowBlur = randof(lil_fib);
-  //   c2.shadowOffset = new Point(2,2);
-  // }
+  from = event.point;
 }
 
 function onMouseDrag(event) {
-  for(var i = 0; i < randof(lil_fib); i++) {
-    var pt = pointInCircle(5 * randof(big_fib));
-
-    path.add(event.point + pt);
-    path.simplify();
-    path.smooth({ type: 'catmull-rom', factor: 1.0 });
+  if(rect) {
+    rect.remove();
   }
 
-  // var c1 = new Path.Circle(new Point(event.point.x, Math.random() * height), Math.floor(Math.random() * 90));
-  // c1.fillColor = randof(colors);
-  // c1.strokeColor = '#0B0A0F';
-  // c1.strokeWidth = 3;
-
-  // for(var i = 0; i < c1.segments.length; i++) {
-  //   c1.segments[i].point.x += i * Math.random() * 5;
-  //   c1.segments[i].point.y -= i * Math.random() * 5;
-  // }
-
-  // if(Math.random() < 0.49) {
-  //   c1.insertBelow(path)
-  // } else {
-  //     c1.shadowColor = 'rgb(0,0,0,0.5)';
-  //     c1.shadowBlur = randof(lil_fib);
-  //     c1.shadowOffset = new Point(2,2);
-  // }
-
+  to = event.point;
+  rect = new Path.Rectangle(from, to);
+  rect.selected = true; 
 }
 
 function onMouseUp(event) {
+
+  // var fill = randof(colors);
+  // rect.fillColor = fill;
+  
+  rect.shadowColor = "rgba(0,0,0,0.25)";
+  rect.shadowBlur = 4 + Math.random() * 20;
+  rect.shadowOffset = new Point(Math.random() * 20, Math.random() * 20);
+  
+  var rand = Math.random();
+
+  if (rand < 0.5) {
+    rect.fillColor = {
+        gradient: {
+          stops: [randof(colors), randof(colors)],
+        },
+        origin: rect.bounds.leftCenter,
+        destination: rect.bounds.rightCenter
+    }
+    console.log(rect.fillColor.destination);
+    
+  } else {
+    
+    rect.fillColor = {
+        gradient: {
+          stops: [randof(colors), randof(colors)],
+        },
+        origin: rect.bounds.bottomCenter - new Point(0, 3),
+        destination: rect.bounds.bottomCenter - new Point (0, Math.random() * height)
+    }
+    rect.shadowColor = "rgba(0,0,0,0)";
+    console.log(rect.fillColor.destination);
+    
+  }
+  
+  if (rand > 0.75) {
+    rect.blendMode = 'multiply'
+  }
+
+
+  rect.selected = false;
+  shapes.push(rect);
+  
+  
+  if(shapes.length > 1) {
+    for(var i = 0; i < shapes.length; i++) {
+      shapes[i].tween({ 
+        'bounds.width': shapes[i].bounds.width + 10 * Math.sin(100 * Math.random()),
+        'bounds.height': shapes[i].bounds.height + 10 * Math.sin(100 * Math.random()),
+        'position.x': shapes[i].position.x + 10 * Math.sin(100 * Math.random()),
+        'position.y': shapes[i].position.y + 10 * Math.sin(100 * Math.random())
+      }, {easing: 'easeOutCubic', duration: 250});
+      shapes[i].fillColor.gradient.stops = [randof(colors), randof(colors)];
+    }
+  }
+  
+  
+  rect = new Path.Rectangle();
   
 }
 
 function onFrame(event) {
-  for(var i = 0; i < path.segments.length; i++) {
 
-    path.segments[i].point.x += 1.5 * Math.sin(0.03 *  event.time * i);
-    path.segments[i].point.y += 0.5 * Math.cos(0.05 *  event.time * i);
-
-    path.segments[i].handleIn += 0.52 * Math.random() * Math.cos(8 *  event.time + randof(big_fib) * i);
-    // path.segments[i].handleOut += 0.307 * Math.random() * Math.sin(13 *  event.time + randof(big_fib) * i);
-  }
 }
 
 
-function pointInCircle(n) {
-  // n is the radius
+function pointInCircle(dist) {
   var u = Math.random();
   var v = Math.random();
 
@@ -127,9 +135,29 @@ function pointInCircle(n) {
   var x = r * Math.sin(phi) * Math.cos(theta);
   var y = r * Math.sin(phi) * Math.sin(theta);
 
-  return new Point(n * x, n * y);
+  return new Point(dist * x, dist * y);
 }
 
 function randof(array) {
   return array[Math.floor(Math.random() * array.length)];
+}
+
+
+// save to image
+document.querySelector(".save").onclick = function() {
+  var canvas = document.getElementById("myCanvas");
+  var img = canvas.toDataURL("image/jpg");
+  
+  var el = document.createElement('img');
+  el.setAttribute("src", img);
+  el.style.width = width / 2 + "px";
+  el.style.boxShadow = "2px 2px 6px rgba(0,0,0,0.25)";
+  el.style.position = "fixed";
+  el.style.left = width / 4 + "px";
+  el.style.top = height / 5 + "px";
+  el.style.zIndex = 10;
+  
+  document.body.appendChild(el);
+  
+  canvas.style.filter = "blur(40px)";
 }
